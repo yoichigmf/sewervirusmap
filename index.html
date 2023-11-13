@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Show polygon information on click</title>
+    <title>Virus detection values in sewage water</title>
     <meta property="og:description" content="When a user clicks a polygon, show a popup containing more information." />
     <meta charset='utf-8'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,9 +18,140 @@
         max-width: 400px;
         font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     }
+
+    .select-date {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+
+    #legend {
+        left : 1%;
+        padding: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.10);
+            line-height: 19px;
+            height: 160px;
+            width:230px;
+            margin-bottom: 50px;
+			background-color: #292929;
+     		opacity: 0.8;
+            font-size: 15;
+			color : #FFFFFF;
+        }
+        .legend-key {
+            display:inline-block;
+            border-radius: 30%;
+			border-color : #000000;
+            width: 15px;
+            height: 12px;
+            margin-right: 5px;
+        }
+        .map-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.8);
+            margin-right: 20px;
+            font-family: Arial, sans-serif;
+            overflow: auto;
+            border-radius: 3px;
+        }
+
+
 </style>
-<div id="map"></div>
+
+
+
+<div id="map">
+  
+
+
+</div>
+
+<div class="select-date">
+<select id="year" name="year"></select>
+<select id="month" name="month"></select>
+<select id="date" name="date"></select>
+
+<button onclick="rePaint()">repaint</button>
+</div>
+
+<div class='map-overlay' id='legend'><b>Virus detection values in sewage water</b> <hR> </div>
+
+
 <script>
+
+
+
+dpurl = "https://script.google.com/macros/s/AKfycbzFmDF9US6yJZ4w2x7beisdAivL0HlB5HJUc4-bTFNOJ9-J1nnI-HFaWMiAlf-nA5f0Ew/exec";
+
+
+function rePaint() {
+  const year = document.getElementById('year').value;
+  const month = document.getElementById('month').value;
+  const date = document.getElementById('date').value;
+
+  const curl = dpurl + "?CMD=GETDATA&year=" + year + "&month=" + month + "&date=" + date;
+ 
+    //  データ取得
+    fetch( curl , {
+        method: "GET",
+        mode: "cors"
+     })
+     .then(response => {
+       if (response.ok) {
+          return response.json();
+       }
+    // 404 や 500 ステータスならここに到達する
+      throw new Error('Network response was not ok.');
+      })
+    .then(resJson => {
+
+      LocationList = resJson;
+      console.log(LocationList);
+    }
+    )
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
+
+
+  
+}
+
+
+
+(function() {
+  const isLeapYear = year => (year % 4 === 0) && (year % 100 !== 0) || (year % 400 === 0);
+  const today = new Date();
+  const thisYear = today.getFullYear();
+  const thisMonth = today.getMonth() + 1;
+  const thisDate = today.getDate();
+  const datesOfFebruary = isLeapYear(year) ? 29 : 28;
+  const datesOfYear= [31, datesOfFebruary, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const createOption = (id, startNum, endNum, current) => {
+    const selectDom = document.getElementById(id);
+    let optionDom = '';
+    for (let i = startNum; i <= endNum; i++) {
+      if (i === current) {
+        option = '<option value="' + i + '" selected>' + i + '</option>';
+      } else {
+        option = '<option value="' + i + '">' + i + '</option>';
+      }
+      optionDom += option;
+    }
+    selectDom.insertAdjacentHTML('beforeend', optionDom);
+  }
+  createOption('year', 2021, thisYear, thisYear);
+  createOption('month', 1, 12, thisMonth);
+  createOption('date', 1, datesOfYear[thisMonth - 1], thisDate);
+})()
+
 
 const style = {
   "version": 8,
@@ -45,12 +176,35 @@ const style = {
 
     const map = new maplibregl.Map({
         container: 'map',
-        style:  style,
+        style:  'https://tile.openstreetmap.jp/styles/openmaptiles/style.json',
         center: [107.608889, -6.910833],
         zoom: 12
     });
 
     map.on('load', () => {
+
+
+         // Configuration légende
+
+ 
+    map.getCanvas().style.cursor = 'default';
+    var layers = ['-500', '500-1000', '1000-10000', '10000-50000', '50000-100000', '+100000'];
+    var colors = ['#4d9221', '#a1d76a', '#e6f5d0', '#fde0ef', '#e9a3c9', '#c51b7d'];
+    for (i=0; i<layers.length; i++) {
+        var layer = layers[i] + "";
+        var color = colors[i];
+        var item = document.createElement('div');
+        var key = document.createElement('span');
+        key.className = 'legend-key';
+        key.style.backgroundColor = color;
+        var value = document.createElement('span');
+        value.innerHTML = layer;
+        item.appendChild(key);
+        item.appendChild(value);
+        legend.appendChild(item);
+    }
+
+
         // Add a source for the state polygons.
         map.addSource('states', {
             'type': 'geojson',
@@ -63,10 +217,18 @@ const style = {
             'id': 'states-layer',
             'type': 'fill',
             'source': 'states',
-            'paint': {
-                'fill-color': 'rgba(200, 100, 240, 0.4)',
-                'fill-outline-color': 'rgba(200, 100, 240, 1)'
-            }
+            'layout': {'visibility': 'visible'},
+		'paint': {'fill-outline-color': '#000000',
+                  'fill-color': ['interpolate',['linear'],
+					   ['get', 'value'],
+                        500, '#4d9221',
+						1000, '#a1d76a',
+						10000, '#e6f5d0',
+						50000, '#fde0ef',
+						100000, '#e9a3c9',
+						250000, '#c51b7d'],
+                  'fill-opacity': 0.75}
+
         });
 
 
@@ -78,7 +240,7 @@ const style = {
         map.on('click', 'states-layer', (e) => {
             new maplibregl.Popup()
                 .setLngLat(e.lngLat)
-                .setHTML(e.features[0].properties.name)
+                .setHTML(e.features[0].properties.name + '<br>' + e.features[0].properties.value)
                 .addTo(map);
         });
 
