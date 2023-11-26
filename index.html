@@ -88,7 +88,7 @@
 
 
 
-dpurl = "https://script.google.com/macros/s/AKfycbzFmDF9US6yJZ4w2x7beisdAivL0HlB5HJUc4-bTFNOJ9-J1nnI-HFaWMiAlf-nA5f0Ew/exec";
+dpurl = "https://script.google.com/macros/s/AKfycbwslT9ApN7_obntBMgqQxQJDeOmaRbkmOu6fyrjyrosDf4--X_wsPybyix33xLB16xI1A/exec";
 
 
 function rePaint() {
@@ -101,10 +101,16 @@ function rePaint() {
     //  データ取得
     fetch( curl , {
         method: "GET",
-        mode: "cors"
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+           // 'Access-Control-Allow-Origin': '*'
+        },
+        mode: "no-cors"
      })
      .then(response => {
+       console.log(response);
        if (response.ok) {
+          console.log(response.json());
           return response.json();
        }
     // 404 や 500 ステータスならここに到達する
@@ -114,10 +120,11 @@ function rePaint() {
 
       LocationList = resJson;
       console.log(LocationList);
-    }
+      }
     )
     .catch(error => {
-      console.error('There has been a problem with your fetch operation:', error);
+      let err = error;
+      //console.error('There has been a problem with your fetch operation:', error);
     });
 
 
