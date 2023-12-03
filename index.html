@@ -81,14 +81,61 @@
 <button onclick="rePaint()">repaint</button>
 </div>
 
-<div class='map-overlay' id='legend'><b>Virus detection values in sewage water</b> <hR> </div>
+<div class='map-overlay' id='legend'><b>Virus detection values in sewage water</b> <button onClick="changeLegend()">change legend</button><hR> </div>
 
 
 <script>
 
 
 
-dpurl = "https://script.google.com/macros/s/AKfycbwslT9ApN7_obntBMgqQxQJDeOmaRbkmOu6fyrjyrosDf4--X_wsPybyix33xLB16xI1A/exec";
+dpurl = "https://script.google.com/macros/s/AKfycbzFbyoqYXvqARq2TWAxNVHh0gAfwdl_APuVZfNFfKpLLgVrE8u9fRDtUln8_jCrcLPmuA/exec";
+
+const lgurl = "https://script.google.com/macros/s/AKfycbzFbyoqYXvqARq2TWAxNVHh0gAfwdl_APuVZfNFfKpLLgVrE8u9fRDtUln8_jCrcLPmuA/exec?cmd=GETLEGEND&dummy=sample";
+
+
+//const   lgurl = dpurl + "?cmd=GETLEGEND&test=dummy";
+
+function  changeLegend() {
+  const legend = document.getElementById('legend');
+
+
+  fetch( lgurl, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+           // 'Access-Control-Allow-Origin': '*'
+        },
+        mode: "no-cors"
+     })
+     .then(response => {
+       console.log(response);
+       if (response.ok) {
+          console.log(response.json());
+          return response.json();
+       }
+    // 404 や 500 ステータスならここに到達する
+      throw new Error('Network response was not ok.');
+      })
+    .then(resJson => {
+
+      LocationList = resJson;
+      console.log(LocationList);
+      }
+    )
+    .catch(error => {
+      let err = error;
+      //console.error('There has been a problem with your fetch operation:', error);
+    });
+
+
+
+ // if (legend.style.display == "none") {
+   // legend.style.display = "block";
+  //} else {
+ //   legend.style.display = "none";
+  //}
+
+}
 
 
 function rePaint() {
@@ -197,6 +244,8 @@ const style = {
     map.getCanvas().style.cursor = 'default';
     var layers = ['-500', '500-1000', '1000-10000', '10000-50000', '50000-100000', '+100000'];
     var colors = ['#4d9221', '#a1d76a', '#e6f5d0', '#fde0ef', '#e9a3c9', '#c51b7d'];
+
+
     for (i=0; i<layers.length; i++) {
         var layer = layers[i] + "";
         var color = colors[i];
@@ -237,6 +286,7 @@ const style = {
                   'fill-opacity': 0.75}
 
         });
+
 
 
 
