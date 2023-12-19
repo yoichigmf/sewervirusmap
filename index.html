@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@3.6.0/dist/maplibre-gl.css' />
     <script src='https://unpkg.com/maplibre-gl@3.6.0/dist/maplibre-gl.js'></script>
+
+    <script src='./smap.js'></script>
     <style>
         body { margin: 0; padding: 0; }
         html, body, #map { height: 100%; }
@@ -78,7 +80,7 @@
 <select id="month" name="month"></select>
 <select id="date" name="date"></select>
 
-<button onclick="rePaint()">repaint</button>
+<button onclick="rePaintMap()">repaint</button>
 </div>
 
 <div class='map-overlay' id='legend'><b>Virus detection values in sewage water</b> <button onClick="changeLegend()">change legend</button><hR> </div>
@@ -138,6 +140,18 @@ function  changeLegend() {
 }
 
 
+function rePaintMap(){
+  
+    const year = document.getElementById('year').value;
+    const month = document.getElementById('month').value;
+    const date = document.getElementById('date').value;
+
+    let mapjson = rePaint(dpurl, year, month, date);
+  
+  
+}
+
+/*
 function rePaint() {
   const year = document.getElementById('year').value;
   const month = document.getElementById('month').value;
@@ -177,6 +191,7 @@ function rePaint() {
 
   
 }
+*/
 
 
 
