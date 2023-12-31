@@ -139,7 +139,7 @@ function  changeLegend() {
 
 }
 
-
+//   地図再描画
 function rePaintMap(){
   
     const year = document.getElementById('year').value;
@@ -147,7 +147,10 @@ function rePaintMap(){
     const date = document.getElementById('date').value;
 
     let mapjson = rePaint(dpurl, year, month, date);
-  
+
+    
+   // console.log(mapjson);
+    // map.getSource('states').setData(mapjson);
   
 }
 
@@ -276,6 +279,28 @@ const style = {
     }
 
 
+
+        let  paint_style = {'fill-outline-color': '#000000',
+                  'fill-color': ['interpolate',['linear'],
+					   ['get', 'value'],
+                        500, '#4d9221',
+						1000, '#a1d76a',
+						10000, '#e6f5d0',
+						50000, '#fde0ef',
+						100000, '#e9a3c9',
+						250000, '#c51b7d'],
+                  'fill-opacity': 0.75};
+
+
+           let paintst2 =        {
+           "fill-color": "rgba(59, 16, 16, 1)",
+            "fill-opacity": 0.3,
+            "fill-outline-color": "rgba(12, 1, 1, 1)",
+           "fill-translate-anchor": "map"
+           };
+
+
+
         // Add a source for the state polygons.
         map.addSource('states', {
             'type': 'geojson',
@@ -284,12 +309,62 @@ const style = {
         });
 
         // Add a layer showing the state polygons.
+      /*
         map.addLayer({
             'id': 'states-layer',
             'type': 'fill',
             'source': 'states',
             'layout': {'visibility': 'visible'},
-		'paint': {'fill-outline-color': '#000000',
+            'paint': paintst2
+        });
+	    */
+      map.addLayer({
+            'id': '500-5000',
+            'type': 'fill',
+            'source': 'states',
+            'layout': {'visibility': 'visible'},
+            'paint': {'fill-outline-color': '#000000',
+                  'fill-color': '#fde0ef',
+                  'fill-opacity': 0.75},
+            'filter': ['all', ['>=', 'value', 500], ['<', 'value', 5000]]   
+        });
+       
+        map.addLayer({
+            'id': '5000 - 10000',
+            'type': 'fill',
+            'source': 'states',
+            'layout': {'visibility': 'visible'},
+            'paint': {'fill-outline-color': '#000000',
+                  'fill-color': '#fde0ef',
+                  'fill-opacity': 0.75},
+            'filter': ['all', ['>=', 'value', 5000], ['<', 'value', 10000]]   
+        });
+
+        map.addLayer({
+            'id': '10000 - 50000',
+            'type': 'fill',
+            'source': 'states',
+            'layout': {'visibility': 'visible'},
+            'paint': {'fill-outline-color': '#000000',
+                  'fill-color': '#fde0ef',
+                  'fill-opacity': 0.75},
+            'filter': ['all', ['>=', 'value', 10000], ['<', 'value', 50000]]   
+        });
+
+        map.addLayer({
+            'id': '50000 - 100000',
+            'type': 'fill',
+            'source': 'states',
+            'layout': {'visibility': 'visible'},
+            'paint': {'fill-outline-color': '#000000',
+                  'fill-color': '#fde0ef',
+                  'fill-opacity': 0.75},
+            'filter': ['all', ['>=', 'value', 50000], ['<', 'value', 100000]]   
+        });
+       
+
+       
+  /*          'paint': {'fill-outline-color': '#000000',
                   'fill-color': ['interpolate',['linear'],
 					   ['get', 'value'],
                         500, '#4d9221',
@@ -301,6 +376,7 @@ const style = {
                   'fill-opacity': 0.75}
 
         });
+        */
 
 
 
